@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.1.12)
 project(cohda_ros_cpm_receiver)
 
 ## Find catkin macros and libraries
@@ -8,6 +8,9 @@ find_package(catkin REQUIRED COMPONENTS
   etsi_its_msgs
   # Add other necessary dependencies
 )
+
+set(CMAKE_PREFIX_PATH "/home/airscope/workspace/other_repos/flatbuffers/" ${CMAKE_PREFIX_PATH})
+set(CMAKE_MODULE_PATH "/home/airscope/workspace/other_repos/flatbuffers/" ${CMAKE_MODULE_PATH})
 
 # Find FlatBuffers package
 find_package(Flatbuffers REQUIRED)
@@ -38,7 +41,7 @@ include_directories(
   include
   ${catkin_INCLUDE_DIRS}
   ${Flatbuffers_INCLUDE_DIRS}
-
+  /home/airscope/workspace/other_repos/flatbuffers/include
 )
 
 add_executable(cohda_ros_cpm_receiver src/cpm_receiver.cpp)

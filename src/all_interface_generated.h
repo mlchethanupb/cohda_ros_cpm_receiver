@@ -10,7 +10,7 @@
 // generated, otherwise it may not be compatible.
 static_assert(FLATBUFFERS_VERSION_MAJOR == 23 &&
               FLATBUFFERS_VERSION_MINOR == 5 &&
-              FLATBUFFERS_VERSION_REVISION == 9,
+              FLATBUFFERS_VERSION_REVISION == 26,
              "Non-compatible flatbuffers version included");
 
 namespace Gos {
@@ -3014,7 +3014,7 @@ struct CPMessage FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyOffset(verifier, VT_HEADER) &&
+           VerifyOffsetRequired(verifier, VT_HEADER) &&
            verifier.VerifyTable(header()) &&
            VerifyField<uint64_t>(verifier, VT_GENERATION_DELTA_TIME, 8) &&
            VerifyOffset(verifier, VT_MGMT_CONTAINER) &&
@@ -3048,6 +3048,7 @@ struct CPMessageBuilder {
   ::flatbuffers::Offset<CPMessage> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = ::flatbuffers::Offset<CPMessage>(end);
+    fbb_.Required(o, CPMessage::VT_HEADER);
     return o;
   }
 };
@@ -3070,10 +3071,18 @@ struct CpmPayload FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef CpmPayloadBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_ORIGINATING_STATIONS_CONTAINER = 4,
-    VT_PERCEIVED_OBJECT_CONTAINER = 6
+    VT_SENSOR_INFORMATION_CONTAINER = 6,
+    VT_PERCEPTION_REGION_CONTAINER = 8,
+    VT_PERCEIVED_OBJECT_CONTAINER = 10
   };
   const Gos::OriginatingStationsContainer *originating_stations_container() const {
     return GetPointer<const Gos::OriginatingStationsContainer *>(VT_ORIGINATING_STATIONS_CONTAINER);
+  }
+  const Gos::SensorInformationContainer *sensor_information_container() const {
+    return GetPointer<const Gos::SensorInformationContainer *>(VT_SENSOR_INFORMATION_CONTAINER);
+  }
+  const Gos::PerceptionRegionContainer *perception_region_container() const {
+    return GetPointer<const Gos::PerceptionRegionContainer *>(VT_PERCEPTION_REGION_CONTAINER);
   }
   const Gos::PerceivedObjectContainer *perceived_object_container() const {
     return GetPointer<const Gos::PerceivedObjectContainer *>(VT_PERCEIVED_OBJECT_CONTAINER);
@@ -3082,6 +3091,10 @@ struct CpmPayload FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_ORIGINATING_STATIONS_CONTAINER) &&
            verifier.VerifyTable(originating_stations_container()) &&
+           VerifyOffset(verifier, VT_SENSOR_INFORMATION_CONTAINER) &&
+           verifier.VerifyTable(sensor_information_container()) &&
+           VerifyOffset(verifier, VT_PERCEPTION_REGION_CONTAINER) &&
+           verifier.VerifyTable(perception_region_container()) &&
            VerifyOffset(verifier, VT_PERCEIVED_OBJECT_CONTAINER) &&
            verifier.VerifyTable(perceived_object_container()) &&
            verifier.EndTable();
@@ -3094,6 +3107,12 @@ struct CpmPayloadBuilder {
   ::flatbuffers::uoffset_t start_;
   void add_originating_stations_container(::flatbuffers::Offset<Gos::OriginatingStationsContainer> originating_stations_container) {
     fbb_.AddOffset(CpmPayload::VT_ORIGINATING_STATIONS_CONTAINER, originating_stations_container);
+  }
+  void add_sensor_information_container(::flatbuffers::Offset<Gos::SensorInformationContainer> sensor_information_container) {
+    fbb_.AddOffset(CpmPayload::VT_SENSOR_INFORMATION_CONTAINER, sensor_information_container);
+  }
+  void add_perception_region_container(::flatbuffers::Offset<Gos::PerceptionRegionContainer> perception_region_container) {
+    fbb_.AddOffset(CpmPayload::VT_PERCEPTION_REGION_CONTAINER, perception_region_container);
   }
   void add_perceived_object_container(::flatbuffers::Offset<Gos::PerceivedObjectContainer> perceived_object_container) {
     fbb_.AddOffset(CpmPayload::VT_PERCEIVED_OBJECT_CONTAINER, perceived_object_container);
@@ -3112,9 +3131,13 @@ struct CpmPayloadBuilder {
 inline ::flatbuffers::Offset<CpmPayload> CreateCpmPayload(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<Gos::OriginatingStationsContainer> originating_stations_container = 0,
+    ::flatbuffers::Offset<Gos::SensorInformationContainer> sensor_information_container = 0,
+    ::flatbuffers::Offset<Gos::PerceptionRegionContainer> perception_region_container = 0,
     ::flatbuffers::Offset<Gos::PerceivedObjectContainer> perceived_object_container = 0) {
   CpmPayloadBuilder builder_(_fbb);
   builder_.add_perceived_object_container(perceived_object_container);
+  builder_.add_perception_region_container(perception_region_container);
+  builder_.add_sensor_information_container(sensor_information_container);
   builder_.add_originating_stations_container(originating_stations_container);
   return builder_.Finish();
 }
@@ -3124,7 +3147,9 @@ struct ManagementContainer FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Tabl
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_REFERENCE_TIME = 4,
     VT_REFERENCE_POSITION = 6,
-    VT_STATION_TYPE = 8
+    VT_SEGMENTATION_INFO = 8,
+    VT_MESSAGE_RATE_RANGE = 10,
+    VT_STATION_TYPE = 12
   };
   uint64_t reference_time() const {
     return GetField<uint64_t>(VT_REFERENCE_TIME, 0);
@@ -3132,14 +3157,24 @@ struct ManagementContainer FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Tabl
   const Gos::ReferencePosition *reference_position() const {
     return GetPointer<const Gos::ReferencePosition *>(VT_REFERENCE_POSITION);
   }
+  const Gos::MessageSegmentationInfo *segmentation_info() const {
+    return GetPointer<const Gos::MessageSegmentationInfo *>(VT_SEGMENTATION_INFO);
+  }
+  const Gos::MessageRateRange *message_rate_range() const {
+    return GetPointer<const Gos::MessageRateRange *>(VT_MESSAGE_RATE_RANGE);
+  }
   Gos::StationType station_type() const {
     return static_cast<Gos::StationType>(GetField<int32_t>(VT_STATION_TYPE, 0));
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint64_t>(verifier, VT_REFERENCE_TIME, 8) &&
-           VerifyOffset(verifier, VT_REFERENCE_POSITION) &&
+           VerifyOffsetRequired(verifier, VT_REFERENCE_POSITION) &&
            verifier.VerifyTable(reference_position()) &&
+           VerifyOffset(verifier, VT_SEGMENTATION_INFO) &&
+           verifier.VerifyTable(segmentation_info()) &&
+           VerifyOffset(verifier, VT_MESSAGE_RATE_RANGE) &&
+           verifier.VerifyTable(message_rate_range()) &&
            VerifyField<int32_t>(verifier, VT_STATION_TYPE, 4) &&
            verifier.EndTable();
   }
@@ -3155,6 +3190,12 @@ struct ManagementContainerBuilder {
   void add_reference_position(::flatbuffers::Offset<Gos::ReferencePosition> reference_position) {
     fbb_.AddOffset(ManagementContainer::VT_REFERENCE_POSITION, reference_position);
   }
+  void add_segmentation_info(::flatbuffers::Offset<Gos::MessageSegmentationInfo> segmentation_info) {
+    fbb_.AddOffset(ManagementContainer::VT_SEGMENTATION_INFO, segmentation_info);
+  }
+  void add_message_rate_range(::flatbuffers::Offset<Gos::MessageRateRange> message_rate_range) {
+    fbb_.AddOffset(ManagementContainer::VT_MESSAGE_RATE_RANGE, message_rate_range);
+  }
   void add_station_type(Gos::StationType station_type) {
     fbb_.AddElement<int32_t>(ManagementContainer::VT_STATION_TYPE, static_cast<int32_t>(station_type), 0);
   }
@@ -3165,6 +3206,7 @@ struct ManagementContainerBuilder {
   ::flatbuffers::Offset<ManagementContainer> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = ::flatbuffers::Offset<ManagementContainer>(end);
+    fbb_.Required(o, ManagementContainer::VT_REFERENCE_POSITION);
     return o;
   }
 };
@@ -3173,10 +3215,14 @@ inline ::flatbuffers::Offset<ManagementContainer> CreateManagementContainer(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     uint64_t reference_time = 0,
     ::flatbuffers::Offset<Gos::ReferencePosition> reference_position = 0,
+    ::flatbuffers::Offset<Gos::MessageSegmentationInfo> segmentation_info = 0,
+    ::flatbuffers::Offset<Gos::MessageRateRange> message_rate_range = 0,
     Gos::StationType station_type = Gos::StationType_STN_TYPE_UNKNOWN) {
   ManagementContainerBuilder builder_(_fbb);
   builder_.add_reference_time(reference_time);
   builder_.add_station_type(station_type);
+  builder_.add_message_rate_range(message_rate_range);
+  builder_.add_segmentation_info(segmentation_info);
   builder_.add_reference_position(reference_position);
   return builder_.Finish();
 }
@@ -3309,7 +3355,7 @@ struct OriginatingVehicleContainer FLATBUFFERS_FINAL_CLASS : private ::flatbuffe
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyOffset(verifier, VT_ORIENTATION_ANGLE) &&
+           VerifyOffsetRequired(verifier, VT_ORIENTATION_ANGLE) &&
            verifier.VerifyTable(orientation_angle()) &&
            VerifyOffset(verifier, VT_PITCH_ANGLE) &&
            verifier.VerifyTable(pitch_angle()) &&
@@ -3343,6 +3389,7 @@ struct OriginatingVehicleContainerBuilder {
   ::flatbuffers::Offset<OriginatingVehicleContainer> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = ::flatbuffers::Offset<OriginatingVehicleContainer>(end);
+    fbb_.Required(o, OriginatingVehicleContainer::VT_ORIENTATION_ANGLE);
     return o;
   }
 };
