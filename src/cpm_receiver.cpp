@@ -59,13 +59,13 @@ void decode_received_cpm() {
             perror("recvfrom");
             exit(1);
         }
+        std::cout << "------------------------------------------------------------------" <<  std::endl;
 
-        std::cout << "Received message from client: " << buffer << std::endl;
+        std::cout << "Received message from client: " <<  std::endl;
 
         auto msg = boost::make_shared<etsi_its_msgs::CPM>();
         flatbuffers::FlatBufferBuilder builder;
 
-        std::cout<< "nb bytes " << received_bytes << std::endl;
         if(received_bytes > 150){
             auto gossip = GetGossipMessage(buffer);
 
@@ -120,8 +120,6 @@ void decode_received_cpm() {
 
                     const Gos::CpmPayload* c_payload = cpm->cpm_payload();
 
-                    std::cout << "entered" << std::endl;
-                    std::cout << "skipping decoding station data container" << std::endl;
                     #if 0
                     const Gos::OriginatingStationsContainer *o_stn_ctnr = c_payload->originating_stations_container();
                     if(o_stn_ctnr){
@@ -252,6 +250,7 @@ void decode_received_cpm() {
                                 rosObj.objectAge = obj->object_age();
 
                                 auto obj_classifications_list = obj->classification();
+                                std::cout << "classification list count: " << obj_classifications_list->size() << std::endl;
 
                                 for(auto obj_cls : *obj_classifications_list){
                                     const Gos::ObjectClass *obj_class = obj_cls->object_class();
@@ -270,15 +269,15 @@ void decode_received_cpm() {
                                 const Gos::MapPosition *map_pos = obj->map_position();
                                 const Gos::MapReference *m_ref = map_pos->map_reference();
                                 const Gos::RoadSegmentReferenceID *rd_seg = m_ref->road_segment();
-                                std::cout << "MapPosition/roadseg: region = " << rd_seg->region()<< ", id: "<< rd_seg->id() << std::endl;
+                                //std::cout << "MapPosition/roadseg: region = " << rd_seg->region()<< ", id: "<< rd_seg->id() << std::endl;
                                 const Gos::IntersectionReferenceID *intrsctn_id = m_ref->intersection();
-                                std::cout << "MapPosition/intersection: region = " << intrsctn_id->region()<< ", id: "<< intrsctn_id->id() << std::endl;
+                                //std::cout << "MapPosition/intersection: region = " << intrsctn_id->region()<< ", id: "<< intrsctn_id->id() << std::endl;
 
 
-                                std::cout << "lane id: ", map_pos->lane_id();
-                                std::cout << "conn id: ", map_pos->connection_id();
+                                //std::cout << "lane id: ", map_pos->lane_id();
+                                //std::cout << "conn id: ", map_pos->connection_id();
                                 const Gos::LongitudinalLanePosition *long_lane_pos = map_pos->longitudinal_lane_position();
-                                std::cout << "LongitudinalLanePosition - value= " << long_lane_pos->longitudinal_lane_position_value() << ", conf = " << long_lane_pos->longitudinal_lane_position_confidence() << std::endl;
+                                //std::cout << "LongitudinalLanePosition - value= " << long_lane_pos->longitudinal_lane_position_value() << ", conf = " << long_lane_pos->longitudinal_lane_position_confidence() << std::endl;
 
                                 rosObj.matchedPosition.laneID = map_pos->lane_id();
                                 //@todo -- update the etsi_its_msgs::CPM with the relevant fields.
