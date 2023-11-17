@@ -185,7 +185,7 @@ void decode_received_cpm() {
                                 cart_coord* x_cord = pos->x_cord();
                                 cart_coord* y_cord = pos->y_cord();
                                 cart_coord* z_cord = pos->z_cord();
-                                std::cout << "Object positon: x-" << x_cord << ", y-" <<  y_cord << ", z-" << z_cord << std::endl;
+                                std::cout << "Object positon: x: " << x_cord->value() << ", y: " <<  y_cord->value() << ", z: " << z_cord->value() << std::endl;
 
                                 rosObj.xDistance.value = x_cord->value() / 100;
                                 rosObj.xDistance.confidence = x_cord->confidence();
@@ -258,7 +258,7 @@ void decode_received_cpm() {
                                     std::cout << "object class confidence: " << obj_cls->confidence() << std::endl;
 
                                     rosObj.classification.value  = obj_class->vehicle_sub_class();
-                                    // rosObj.classification.confidence  = obj_cls->confidence(); @todo -- no confidence field
+                                    rosObj.classification.confidence  = obj_cls->confidence(); @todo -- no confidence field
 
                                     break; //@todo = remove this break, when the changes are made to receive list of classifications
 
